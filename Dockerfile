@@ -31,11 +31,9 @@ WORKDIR /opt
 RUN git clone --filter=blob:none "${WAN_REPOSITORY}" Wan2.2 && \
     cd Wan2.2 && \
     git checkout "${WAN_REF}" && \
-    sed -i '/^[[:space:]]*flash_attn[[:space:]]*$/d' requirements.txt && \
-    python -m pip install --no-cache-dir -r requirements.txt
-
-# Flash Attention is optional; build it where the base PyTorch is visible.
-RUN python -m pip install --no-cache-dir flash-attn --no-build-isolation || true
+    sed -i '/^[[:space:]]*flash_attn/d' requirements.txt && \
+    python -m pip install --no-cache-dir -r requirements.txt && \
+    (python -m pip install --no-cache-dir --no-build-isolation flash-attn || true)
 
 RUN python -m pip install --no-cache-dir \
         "huggingface_hub[cli]" \
@@ -43,6 +41,7 @@ RUN python -m pip install --no-cache-dir \
         requests \
         azure-storage-blob \
         azure-identity \
+        peft \
         av \
         moviepy \
         librosa \
